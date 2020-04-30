@@ -33,24 +33,53 @@ Throughout your report make sure you always include the code that you used to ge
 
 
 ## Loading and preprocessing the data
-```{r Loading Data}
+
+```r
 library("data.table")
 library(dplyr)
+```
+
+```
+## 
+## Attaching package: 'dplyr'
+```
+
+```
+## The following objects are masked from 'package:data.table':
+## 
+##     between, first, last
+```
+
+```
+## The following objects are masked from 'package:stats':
+## 
+##     filter, lag
+```
+
+```
+## The following objects are masked from 'package:base':
+## 
+##     intersect, setdiff, setequal, union
+```
+
+```r
 library(ggplot2)
 
 act <- read.csv("/Users/amin_mac_pro/RepData_PeerAssessment1/activity.csv")
-
-
-
-
 ```
 
-```{r ColumnNames}
+
+```r
 colnames(act)
+```
+
+```
+## [1] "steps"    "date"     "interval"
 ```
 ## What is mean total number of steps taken per day?
 
-```{r }
+
+```r
 totalSteps <- act %>%
   group_by(date) %>% 
   summarise(total_steps = sum(steps))
@@ -58,67 +87,144 @@ totalSteps <- act %>%
 head(totalSteps, 10)
 ```
 
-```{r}
-ggplot(totalSteps, aes(x = total_steps)) +
-    geom_histogram(fill = "green", binwidth = 1000) +
-    labs(title = "Daily Steps", x = "Total Steps", y = "Frequency")
-
+```
+## # A tibble: 10 x 2
+##    date       total_steps
+##    <fct>            <int>
+##  1 2012-10-01          NA
+##  2 2012-10-02         126
+##  3 2012-10-03       11352
+##  4 2012-10-04       12116
+##  5 2012-10-05       13294
+##  6 2012-10-06       15420
+##  7 2012-10-07       11015
+##  8 2012-10-08          NA
+##  9 2012-10-09       12811
+## 10 2012-10-10        9900
 ```
 
 
-```{r }
+```r
+ggplot(totalSteps, aes(x = total_steps)) +
+    geom_histogram(fill = "green", binwidth = 1000) +
+    labs(title = "Daily Steps", x = "Total Steps", y = "Frequency")
+```
+
+```
+## Warning: Removed 8 rows containing non-finite values (stat_bin).
+```
+
+![](PA1_template_files/figure-html/unnamed-chunk-2-1.png)<!-- -->
+
+
+
+```r
 Mean_Median <- totalSteps %>% 
   summarise(mean_steps = mean(total_steps,na.rm = TRUE),median_steps = median(total_steps, na.rm = TRUE))
 
 
 head(Mean_Median)
+```
 
-
+```
+## # A tibble: 1 x 2
+##   mean_steps median_steps
+##        <dbl>        <int>
+## 1     10766.        10765
 ```
 
 
 ## What is the average daily activity pattern?
 
-```{r }
+
+```r
 intervalSteps <- act %>%
   group_by(interval) %>% 
   summarise(interval_steps = mean(steps,na.rm = TRUE))
 
 head(intervalSteps, 10)
 ```
-```{r}
+
+```
+## # A tibble: 10 x 2
+##    interval interval_steps
+##       <int>          <dbl>
+##  1        0         1.72  
+##  2        5         0.340 
+##  3       10         0.132 
+##  4       15         0.151 
+##  5       20         0.0755
+##  6       25         2.09  
+##  7       30         0.528 
+##  8       35         0.868 
+##  9       40         0     
+## 10       45         1.47
+```
+
+```r
 ggplot(intervalSteps, aes(x = interval , y = interval_steps)) + 
   geom_line(color="green", size=1) + 
   labs(title = "Avg. Daily Steps", x = "Interval", y = "Avg. Steps per day")
-
-
 ```
 
+![](PA1_template_files/figure-html/unnamed-chunk-5-1.png)<!-- -->
 
-```{r }
+
+
+```r
 max_interval <- intervalSteps %>%
   filter( interval_steps == max(interval_steps,na.rm = TRUE))
 
 head(max_interval)
 ```
+
+```
+## # A tibble: 1 x 2
+##   interval interval_steps
+##      <int>          <dbl>
+## 1      835           206.
+```
 ## Imputing missing values
 
-```{r }
+
+```r
 totalNA <- act %>%
   summarise(total_NA = sum(is.na(steps)))
 
 head(totalNA, 10)
 ```
-```{r}
+
+```
+##   total_NA
+## 1     2304
+```
+
+```r
 act_1 <- act %>% 
   group_by(interval) %>% 
   mutate(steps = replace(steps, is.na(steps), median(steps, na.rm=TRUE)))
   #summarise(interval_steps = mean(steps,na.rm = TRUE))
 head(act_1) 
+```
 
+```
+## # A tibble: 6 x 3
+## # Groups:   interval [6]
+##   steps date       interval
+##   <int> <fct>         <int>
+## 1     0 2012-10-01        0
+## 2     0 2012-10-01        5
+## 3     0 2012-10-01       10
+## 4     0 2012-10-01       15
+## 5     0 2012-10-01       20
+## 6     0 2012-10-01       25
+```
+
+```r
 data.table::fwrite(x = act_1, file = "/Users/amin_mac_pro/RepData_PeerAssessment1/tidyactivity.csv", quote = FALSE)
 ```
-```{r }
+
+```r
 totalSteps <- act_1 %>%
   group_by(date) %>% 
   summarise(total_steps = sum(steps))
@@ -126,26 +232,51 @@ totalSteps <- act_1 %>%
 head(totalSteps, 10)
 ```
 
-```{r}
+```
+## # A tibble: 10 x 2
+##    date       total_steps
+##    <fct>            <int>
+##  1 2012-10-01        1141
+##  2 2012-10-02         126
+##  3 2012-10-03       11352
+##  4 2012-10-04       12116
+##  5 2012-10-05       13294
+##  6 2012-10-06       15420
+##  7 2012-10-07       11015
+##  8 2012-10-08        1141
+##  9 2012-10-09       12811
+## 10 2012-10-10        9900
+```
+
+
+```r
 ggplot(totalSteps, aes(x = total_steps)) +
     geom_histogram(fill = "green", binwidth = 1000) +
     labs(title = "Daily Steps", x = "Total Steps", y = "Frequency")
-
 ```
-```{r }
+
+![](PA1_template_files/figure-html/unnamed-chunk-10-1.png)<!-- -->
+
+```r
 Mean_Median <- totalSteps %>% 
   summarise(mean_steps = mean(total_steps,na.rm = TRUE),median_steps = median(total_steps, na.rm = TRUE))
 
 
 head(Mean_Median)
+```
 
-
+```
+## # A tibble: 1 x 2
+##   mean_steps median_steps
+##        <dbl>        <int>
+## 1      9504.        10395
 ```
 
 Yes they are different.
 
 ## Are there differences in activity patterns between weekdays and weekends?
-```{r}
+
+```r
 act_2 <- act %>% 
   mutate(date = as.POSIXct(date, format = "%Y-%m-%d"))
 
@@ -161,19 +292,48 @@ act_2 <- act_2 %>%
 head(act_2)
 ```
 
+```
+##   steps       date interval day_week      type
+## 1    NA 2012-10-01        0   Monday week_days
+## 2    NA 2012-10-01        5   Monday week_days
+## 3    NA 2012-10-01       10   Monday week_days
+## 4    NA 2012-10-01       15   Monday week_days
+## 5    NA 2012-10-01       20   Monday week_days
+## 6    NA 2012-10-01       25   Monday week_days
+```
 
-```{r }
+
+
+```r
 interval_Steps_weekdays <- act_2 %>%
   group_by(interval,type) %>% 
   summarise(interval_steps = mean(steps,na.rm = TRUE))
 
 head(interval_Steps_weekdays, 10)
 ```
-```{r}
-
-ggplot(interval_Steps_weekdays , aes(x = interval , y = interval_steps, color=`type`)) + geom_line() + labs(title = "Avg. Daily Steps by Weektype", x = "Interval", y = "No. of Steps") + facet_wrap(~`type` , ncol = 1, nrow=2)
 
 ```
+## # A tibble: 10 x 3
+## # Groups:   interval [5]
+##    interval type      interval_steps
+##       <int> <chr>              <dbl>
+##  1        0 week_days          2.33 
+##  2        0 weekend            0    
+##  3        5 week_days          0.462
+##  4        5 weekend            0    
+##  5       10 week_days          0.179
+##  6       10 weekend            0    
+##  7       15 week_days          0.205
+##  8       15 weekend            0    
+##  9       20 week_days          0.103
+## 10       20 weekend            0
+```
+
+```r
+ggplot(interval_Steps_weekdays , aes(x = interval , y = interval_steps, color=`type`)) + geom_line() + labs(title = "Avg. Daily Steps by Weektype", x = "Interval", y = "No. of Steps") + facet_wrap(~`type` , ncol = 1, nrow=2)
+```
+
+![](PA1_template_files/figure-html/unnamed-chunk-14-1.png)<!-- -->
 
 
 
